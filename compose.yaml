@@ -1,0 +1,44 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    environment:
+      - Tz=Europe/Warsaw
+    volumes:
+      - ./config:/config
+    network_mode: host
+    privileged: true
+    devices:
+      - ${USB_ZIGBEE_DONGLE}:/dev/ttyUSB0
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    environment:
+      - Tz=Europe/Warsaw
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - "./mosquitto/config:/mosquitto/config"
+      - "./mosquitto/data:/mosquitto/data"
+      - "./mosquitto/log:/mosquitto/log"
+    restart: unless-stopped
+  frigate:
+    platform: linux/arm64
+    container_name: frigate
+    privileged: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "256mb"
+    ports:
+     - "5000:5000"
+    volumes:
+     - "./frigate/config:/config"
+     - "./frigate/storage:/media/frigate"
+    environment:
+     - Tz=Europe/Warsaw
+     - FRIGATE_MQTT_HOST=mosquitto
+     - FRIGATE_RTSP_USER=${RTSP_USER_HOME}
+     - FRIGATE_RTSP_PASS=${RTSP_PASS_HOME}

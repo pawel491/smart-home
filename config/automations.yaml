@@ -1,0 +1,75 @@
+- id: '1755358088562'
+  alias: Światło podwórko po zachodzie
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: 0
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      device_id: 3599cfb8d66a509a1506d13bec5d3abc
+  mode: single
+- id: '1755376357693'
+  alias: Światło podwórko po wschodzie
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunrise
+    offset: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      device_id: 3599cfb8d66a509a1506d13bec5d3abc
+  mode: single
+- id: '1755966478314'
+  alias: all occupancy inside
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.inside_zone_all_occupancy
+    to: 'on'
+  conditions: []
+  actions:
+  - type: toggle
+    device_id: 3599cfb8d66a509a1506d13bec5d3abc
+    entity_id: 656814e81b2d3420a1be08b217610799
+    domain: switch
+  mode: single
+- id: '1755966538329'
+  alias: all occupancy outside
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.outside_zone_all_occupancy
+    to: 'on'
+  conditions: []
+  actions:
+  - type: toggle
+    device_id: 3599cfb8d66a509a1506d13bec5d3abc
+    entity_id: 656814e81b2d3420a1be08b217610799
+    domain: switch
+  mode: single
+- id: '1755966626313'
+  alias: all occupancy doorway
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.doorway_zone_all_occupancy
+    to: 'on'
+  conditions: []
+  actions:
+  - type: toggle
+    device_id: 3599cfb8d66a509a1506d13bec5d3abc
+    entity_id: 656814e81b2d3420a1be08b217610799
+    domain: switch
+  mode: single

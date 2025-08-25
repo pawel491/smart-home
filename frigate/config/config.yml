@@ -1,0 +1,92 @@
+mqtt:
+  enabled: true
+  host: 192.168.33.25
+  port: 1883
+  topic_prefix: frigate
+
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 4
+
+cameras:
+  camera1:
+    ffmpeg:
+      inputs:
+        - path: 
+            rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASS}@192.168.33.64:554/Streaming/Channels/102
+          roles:
+            - detect
+        - path: 
+            rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASS}@192.168.33.64:554/Streaming/Channels/101
+          roles:
+            - record
+    detect:
+      width: 640
+      height: 360
+      fps: 5
+    objects:
+      track:
+#        - car
+        - person
+#        - motorcycle
+        #- cat
+    motion:
+      mask:
+        - 0.003,0.818,0,0,0.163,0
+        - 0.427,0,0.429,0.269,0.082,0.405,0.164,0
+        - 0.2,0.36,0.215,0.437,0.303,0.412,0.307,0.315
+        - 0.341,0.303,0.345,0.383,0.431,0.364,0.429,0.269
+        - 0.509,0.234,0.472,0.267,0.467,0.335,0.529,0.353,0.563,0.314,0.554,0.269
+        - 0.428,0.186,0.844,0.185,0.943,0,0.427,0
+        - 1,0.166,0.921,0.042,0.943,0,1,0
+    zones:
+      outside_zone:
+        coordinates: 0.085,0.399,0.003,0.818,0,1,0.155,1,0.153,0.377
+        objects:
+          - person
+        #inertia: 5
+        #loitering_time: 3
+      inside_zone:
+        coordinates: 
+          0.153,0.377,0.429,0.269,0.559,0.318,0.677,0.185,0.844,0.185,0.92,0.044,1,0.166,1,1,0.155,1
+        objects:
+          - person
+        #inertia: 5
+        #loitering_time: 2
+      doorway_zone:
+        coordinates: 0.428,0.187,0.677,0.185,0.663,0.301,0.563,0.316,0.429,0.267
+        objects: person
+#        inertia: 3
+#        loitering_time: 0
+    review:
+      alerts:
+        required_zones: []
+          #- outside_zone
+          #- inside_zone
+          #- doorway_zone
+      detections:
+        required_zones: []
+          #- outside_zone
+          #- inside_zone
+          #- doorway_zone
+record:
+  enabled: true
+  retain:
+    days: 0
+  alerts:
+    retain:
+      days: 2
+      mode: active_objects
+  detections:
+    retain:
+      days: 2
+      mode: active_objects
+
+#snapshots: #is it usefull?
+#  enabled: true
+#  retain:
+#    default: 7
+detect:
+  enabled: true
+version: 0.16-0

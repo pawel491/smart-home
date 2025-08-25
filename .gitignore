@@ -1,0 +1,10 @@
+*.mp4
+config/.storage/
+*.log
+*.db
+*db*
+*log*
+frigate/storage/
+.env
+*secrets.yml
+*secrets.yaml
