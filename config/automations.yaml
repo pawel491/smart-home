@@ -28,48 +28,96 @@
     target:
       device_id: 3599cfb8d66a509a1506d13bec5d3abc
   mode: single
-- id: '1755966478314'
-  alias: all occupancy inside
+- id: '1756154431227'
+  alias: outside car occup
   description: ''
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.inside_zone_all_occupancy
+    - binary_sensor.outside_zone_car_occupancy
     to: 'on'
   conditions: []
-  actions:
-  - type: toggle
-    device_id: 3599cfb8d66a509a1506d13bec5d3abc
-    entity_id: 656814e81b2d3420a1be08b217610799
-    domain: switch
+  actions: []
   mode: single
-- id: '1755966538329'
-  alias: all occupancy outside
+- id: '1756285762507'
+  alias: test take snapshot
   description: ''
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.outside_zone_all_occupancy
+    - binary_sensor.inside_zone_person_occupancy
     to: 'on'
   conditions: []
   actions:
-  - type: toggle
-    device_id: 3599cfb8d66a509a1506d13bec5d3abc
-    entity_id: 656814e81b2d3420a1be08b217610799
-    domain: switch
+  - action: image.snapshot
+    metadata: {}
+    data:
+      filename: sstest
+    target:
+      device_id: ffb020372b1320f1e5f07dd0174a623a
   mode: single
-- id: '1755966626313'
-  alias: all occupancy doorway
+- id: '1756285607832'
+  alias: Notify when Person in InsideZone
   description: ''
   triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.doorway_zone_all_occupancy
-    to: 'on'
+  - trigger: mqtt
+    topic: frigate/events
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.payload_json[''after''][''label''] == ''person'' and
+      ''inside_zone'' in trigger.payload_json[''after''][''entered_zones''] }}
+
+      '
+  - condition: state
+    entity_id: timer.notification_timer
+    state: idle
+  actions:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - action: notify.mobile_app_samsung_pawel
+    metadata: {}
+    data:
+      title: Wykryto Osobe w InsideZone
+      message: Wykryto {{ trigger.payload_json['after']['label'] }} na kamerze {{
+        trigger.payload_json['after']['camera'] }}!
+      data:
+        image: http://192.168.33.25:5000/api/events/{{ trigger.payload_json['after']['id']
+          }}/snapshot.jpg
+  - action: notify.mobile_app_samsung_pawel
+    metadata: {}
+    data:
+      title: Wykryto Osobe w InsideZone
+      data:
+        image: http://192.168.33.25:5000/api/events/1756311001.256646-crq7uj/snapshot.jpg
+      message: Wykryto osobę na kamerze
+    enabled: false
+  - action: timer.start
+    metadata: {}
+    data: {}
+    target:
+      entity_id: timer.notification_timer
+  - action: notify.persistent_notification
+    metadata: {}
+    data:
+      message: Wykryto {{ trigger.payload_json['after']['label'] }} na kamerze {{
+        trigger.payload_json['after']['camera'] }}!
+      title: '"http://192.168.33.25:5000/api/events/{{ trigger.payload_json[''after''][''id'']   }}/snapshot.jpg"'
+      data:
+        image: http://192.168.33.25:5000/api/events/{{ trigger.payload_json['after']['id']
+          }}/snapshot.jpg
+  mode: single
+- id: '1757017339037'
+  alias: Przenies timelapse
+  description: ''
+  triggers: []
   conditions: []
   actions:
-  - type: toggle
-    device_id: 3599cfb8d66a509a1506d13bec5d3abc
-    entity_id: 656814e81b2d3420a1be08b217610799
-    domain: switch
+  - action: shell_command.move_frigate_timelapse
+    metadata: {}
+    data: 
+      source: /storage/exports/timelapse.mp4
+      destination: /media/frigate/timelapse/timelapse.mp4
   mode: single
